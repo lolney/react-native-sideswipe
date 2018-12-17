@@ -35,7 +35,7 @@ export default class SideSwipe extends Component<CarouselProps, State> {
     data: [],
     extractKey: (item: *, index: number) => `sideswipe-carousel-item-${index}`,
     itemWidth: screenWidth,
-    onEndReached: () => {},
+    inverted: false,
     onEndReachedThreshold: 0.9,
     onIndexChange: () => {},
     renderItem: () => null,
@@ -126,6 +126,7 @@ export default class SideSwipe extends Component<CarouselProps, State> {
           getItemLayout={this.getItemLayout}
           keyExtractor={extractKey}
           initialScrollIndex={currentIndex}
+          inverted={this.props.inverted}
           ref={this.getRef}
           scrollEnabled={false}
           showsHorizontalScrollIndicator={false}
@@ -163,6 +164,10 @@ export default class SideSwipe extends Component<CarouselProps, State> {
     index,
   });
 
+  getInversionFactor = () => {
+    return this.props.inverted ? -1 : 1;
+  }
+
   handleGestureTerminationRequest = (e: GestureEvent, s: GestureState) =>
     this.props.shouldRelease(s);
 
@@ -170,6 +175,7 @@ export default class SideSwipe extends Component<CarouselProps, State> {
     this.props.shouldCapture(s);
 
   handleGestureMove = (e: GestureEvent, { dx }: GestureState) => {
+    dx = this.getInversionFactor() * dx;
     const currentOffset: number =
       this.state.currentIndex * this.props.itemWidth;
     const resolvedOffset: number = currentOffset - dx;
@@ -181,6 +187,8 @@ export default class SideSwipe extends Component<CarouselProps, State> {
   };
 
   handleGestureRelease = (e: GestureEvent, { dx, vx }: GestureState) => {
+    dx = this.getInversionFactor() * dx;
+    
     const currentOffset: number =
       this.state.currentIndex * this.props.itemWidth;
     const resolvedOffset: number = currentOffset - dx;
